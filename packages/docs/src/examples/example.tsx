@@ -1,6 +1,7 @@
 import { styled } from '@compiled/css-in-js';
 import React, { useState } from 'react';
 import { CodeBlock } from '@compiled/website-ui';
+import { motion, AnimateSharedLayout } from 'framer-motion';
 
 interface ExampleProps {
   before: string;
@@ -8,13 +9,13 @@ interface ExampleProps {
   children: JSX.Element;
 }
 
-const ExampleRoot = styled.div`
+const ExampleRoot = styled(motion.div)`
   box-shadow: rgba(9, 30, 66, 0.25) 0px 12px 24px -6px,
     rgba(9, 30, 66, 0.31) 0px 0px 1px;
   border-radius: 5px;
 `;
 
-const ExampleSwitcher = styled.div`
+const ExampleSwitcher = styled(motion.div)`
   display: flex;
 
   > * {
@@ -41,7 +42,7 @@ const ExampleSwitcher = styled.div`
   }
 `;
 
-const ExampleButton = styled.button<{
+const ExampleButton = styled(motion.button)<{
   fullWidth?: boolean;
   isSelected?: boolean;
 }>`
@@ -62,7 +63,7 @@ const ExampleButton = styled.button<{
   }
 `;
 
-const ExampleContainer = styled.div`
+const ExampleContainer = styled(motion.div)`
   background-color: #fff;
   display: flex;
   border-radius: 0 0 5px 5px;
@@ -87,41 +88,46 @@ export const Example = ({ before, after, children }: ExampleProps) => {
   const [html, setHtml] = useState('');
 
   return (
-    <ExampleRoot>
-      <ExampleButton fullWidth onClick={() => setIsShown((prev) => !prev)}>
-        {isShown ? 'Show code' : 'Show compiled'}
-      </ExampleButton>
-      <ExampleSwitcher data-is-shown={isShown}>
-        <CodeBlock variant="sharp">{before}</CodeBlock>
-        <CodeBlock variant="sharp">{after}</CodeBlock>
-      </ExampleSwitcher>
-      <ExampleContainer>
-        <span
-          css={{ display: 'flex', padding: '1.5rem', alignItems: 'center' }}
-          ref={(ref) => (ref ? setHtml(ref.innerHTML) : '')}>
-          {children}
-        </span>
+    <AnimateSharedLayout>
+      <ExampleRoot animate>
         <ExampleButton
-          data-button
-          isSelected={htmlShown}
-          onClick={() => setHtmlShown((prev) => !prev)}>
-          HTML
+          animate
+          fullWidth
+          onClick={() => setIsShown((prev) => !prev)}>
+          {isShown ? 'Show code' : 'Show compiled'}
         </ExampleButton>
-        <span
-          css={{
-            opacity: htmlShown ? 1 : 0,
-            pointerEvents: htmlShown ? 'auto' : 'none',
-            paddingTop: '2rem',
-            transition: 'opacity 50ms',
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            minHeight: '100%',
-          }}>
-          <CodeBlock>{html}</CodeBlock>
-        </span>
-      </ExampleContainer>
-    </ExampleRoot>
+        <ExampleSwitcher animate data-is-shown={isShown}>
+          <CodeBlock variant="sharp">{before}</CodeBlock>
+          <CodeBlock variant="sharp">{after}</CodeBlock>
+        </ExampleSwitcher>
+        <ExampleContainer>
+          <span
+            css={{ display: 'flex', padding: '1.5rem', alignItems: 'center' }}
+            ref={(ref) => (ref ? setHtml(ref.innerHTML) : '')}>
+            {children}
+          </span>
+          <ExampleButton
+            data-button
+            isSelected={htmlShown}
+            onClick={() => setHtmlShown((prev) => !prev)}>
+            HTML
+          </ExampleButton>
+          <span
+            css={{
+              opacity: htmlShown ? 1 : 0,
+              pointerEvents: htmlShown ? 'auto' : 'none',
+              paddingTop: '2rem',
+              transition: 'opacity 50ms',
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              minHeight: '100%',
+            }}>
+            <CodeBlock>{html}</CodeBlock>
+          </span>
+        </ExampleContainer>
+      </ExampleRoot>
+    </AnimateSharedLayout>
   );
 };
